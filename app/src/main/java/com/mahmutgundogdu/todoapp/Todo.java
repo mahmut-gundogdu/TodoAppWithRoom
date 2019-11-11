@@ -19,4 +19,9 @@ public class Todo {
 
     public String description;
 
+    @NonNull
+    @Override
+    public String toString() {
+        return title;
+    }
 }

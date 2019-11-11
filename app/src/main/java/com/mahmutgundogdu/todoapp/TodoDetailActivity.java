@@ -22,6 +22,8 @@ public class TodoDetailActivity extends AppCompatActivity {
 
     private AppDatabase appDatabase;
 
+    Integer id = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +34,12 @@ public class TodoDetailActivity extends AppCompatActivity {
 
         appDatabase = AppDatabase.getInstance(this);
 
+        Intent intent = getIntent();
+        boolean isIdExists = intent.hasExtra("id");
+        if (isIdExists) {
+            id = intent.getIntExtra("id", 0);
+            new GetTodoAsyncTask().execute(id);
+        }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +53,14 @@ public class TodoDetailActivity extends AppCompatActivity {
                             .setAction("Action", null).show();
                 } else {
 
-                    insert(name.getText().toString(), description.getText().toString());
+                    Todo todo = new Todo(name.getText().toString(), description.getText().toString());
+
+                    if (id == null) {
+                        new CreateTodoAsyncTask().execute(todo);
+                    } else {
+                        todo.id = id;
+                        new UpdateTodoAsync().execute(todo);
+                    }
 
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(i);
@@ -56,24 +71,51 @@ public class TodoDetailActivity extends AppCompatActivity {
 
     }
 
-    private void insert(String name, String description) {
-        Todo todo = new Todo(name, description);
-
-        new CreateTodoAsyncTask().execute(todo);
-    }
-
     public void fab_click(View v) {
 
 
     }
 
 
-    private class CreateTodoAsyncTask extends AsyncTask<Todo,Void,Void>{
+    private class CreateTodoAsyncTask extends AsyncTask<Todo, Void, Void> {
 
         @Override
         protected Void doInBackground(Todo... todos) {
             appDatabase.todoModel().insert(todos[0]);
 
+            return null;
+        }
+    }
+
+    private class GetTodoAsyncTask extends AsyncTask<Integer, Void, Todo> {
+
+        @Override
+        protected Todo doInBackground(Integer... ints) {
+
+            Integer id = ints[0];
+            Todo todo = appDatabase.todoModel().get(id);
+
+            return todo;
+        }
+
+
+        @Override
+        protected void onPostExecute(Todo todo) {
+            super.onPostExecute(todo);
+            EditText name = findViewById(R.id.name);
+            EditText description = findViewById(R.id.description);
+            name.setText(todo.title);
+            description.setText(todo.description);
+        }
+    }
+
+    private class UpdateTodoAsync extends AsyncTask<Todo, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Todo... todos) {
+
+            Todo todo = todos[0];
+            appDatabase.todoModel().update(todo);
             return null;
         }
     }
