@@ -16,14 +16,13 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    MainViewModel viewModel;
+
     private AppDatabase appDatabase;
 
     List<Todo> itemList = new ArrayList<>();
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ///   viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         appDatabase = AppDatabase.getInstance(this);
         new GetTodoListAsyncTask().execute();
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -105,23 +103,5 @@ public class MainActivity extends AppCompatActivity {
             arrayAdapter.notifyDataSetChanged();
             itemList = todos;
         }
-        //
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//
-//            List<Todo> todos = appDatabase.todoModel().getAll();
-//
-//            ListView listView = findViewById(R.id.listView);
-//
-//
-//            ArrayAdapter<Todo> arrayAdapter = new ArrayAdapter<Todo>
-//                    (getApplicationContext(), android.R.layout.simple_list_item_1, ulkeler);
-//
-//            listView.setAdapter(arrayAdapter);
-//
-//            return null;
-//        }
-
-
     }
 }
